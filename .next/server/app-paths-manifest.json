@@ -1,0 +1,7 @@
+{
+  "/r/[id]/confirm/[ticket]/page": "app/r/[id]/confirm/[ticket]/page.js",
+  "/lobby/page": "app/lobby/page.js",
+  "/raffle/[id]/verify/page": "app/raffle/[id]/verify/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/dashboard/route": "app/api/dashboard/route.js"
+}

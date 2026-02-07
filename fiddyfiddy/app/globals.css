@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #7c3aed;
+  --secondary: #00d4ff;
+  --dark: #1a1a2e;
+  --darker: #16213e;
+}
+
+body {
+  background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+/* Form inputs */
+.input {
+  @apply w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors;
+}
+
+.input-error {
+  @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+}
+
+/* Buttons */
+.btn {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply bg-primary hover:bg-primary/80 text-white;
+}
+
+.btn-secondary {
+  @apply bg-secondary hover:bg-secondary/80 text-dark;
+}
+
+.btn-success {
+  @apply bg-emerald-500 hover:bg-emerald-600 text-white;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white;
+}
+
+.btn-ghost {
+  @apply bg-white/10 hover:bg-white/20 text-white;
+}
+
+/* Cards */
+.card {
+  @apply bg-white/5 border border-white/10 rounded-xl p-6;
+}
+
+.card-hover {
+  @apply hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer;
+}
+
+/* Status badges */
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-draft {
+  @apply bg-gray-500/20 text-gray-300;
+}
+
+.badge-active {
+  @apply bg-emerald-500/20 text-emerald-400;
+}
+
+.badge-drawing {
+  @apply bg-amber-500/20 text-amber-400;
+}
+
+.badge-complete {
+  @apply bg-primary/20 text-primary;
+}
+
+.badge-cancelled {
+  @apply bg-red-500/20 text-red-400;
+}
+
+.badge-pending {
+  @apply bg-gray-500/20 text-gray-400;
+}
+
+.badge-verified {
+  @apply bg-blue-500/20 text-blue-400;
+}
+
+.badge-confirmed {
+  @apply bg-emerald-500/20 text-emerald-400;
+}
+
+.badge-invalid {
+  @apply bg-red-500/20 text-red-400;
+}
+
+/* Tables */
+.table {
+  @apply w-full border-collapse;
+}
+
+.table th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-secondary border-b border-white/10;
+}
+
+.table td {
+  @apply px-4 py-3 text-sm border-b border-white/10;
+}
+
+.table tr:hover {
+  @apply bg-white/5;
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(124, 58, 237, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Jackpot counter */
+.jackpot-display {
+  @apply text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-secondary;
+}
+
+/* Warning box */
+.warning-box {
+  @apply bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-amber-200;
+}
+
+/* Success box */
+.success-box {
+  @apply bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 text-emerald-200;
+}
+
+/* Error box */
+.error-box {
+  @apply bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-200;
+}
+
+/* Info box */
+.info-box {
+  @apply bg-secondary/10 border border-secondary/30 rounded-lg p-4 text-secondary;
+}
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+  .hide-mobile {
+    display: none;
+  }
+  
+  .table-responsive {
+    @apply overflow-x-auto;
+  }
+  
+  .table-responsive .table {
+    @apply min-w-[600px];
+  }
+}
+
+/* Loading spinner */
+.spinner {
+  @apply w-6 h-6 border-2 border-white/20 border-t-primary rounded-full animate-spin;
+}
+
+/* Checkbox custom */
+.checkbox {
+  @apply w-5 h-5 rounded border-2 border-white/30 bg-transparent checked:bg-primary checked:border-primary focus:ring-primary focus:ring-offset-0 cursor-pointer;
+}
+
+/* Screenshot thumbnail */
+.screenshot-thumb {
+  @apply w-16 h-16 object-cover rounded-lg border border-white/20 cursor-pointer hover:border-primary transition-colors;
+}
