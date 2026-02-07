@@ -67,12 +67,17 @@ export default function ReportPage() {
             <span>←</span>
             <span>Dashboard</span>
           </Link>
-          <button 
-            onClick={() => window.print()} 
-            className="btn btn-ghost text-sm"
-          >
-            🖨️ Print Report
-          </button>
+          <div className="flex gap-2">
+            <Link href={`/raffle/${params.id}/flyer`} className="btn btn-ghost text-sm">
+              📄 Print Flyer
+            </Link>
+            <button 
+              onClick={() => window.print()} 
+              className="btn btn-ghost text-sm"
+            >
+              🖨️ Print Report
+            </button>
+          </div>
         </div>
       </header>
 

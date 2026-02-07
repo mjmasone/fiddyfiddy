@@ -230,6 +230,9 @@ function RaffleCard({ raffle }) {
             <Link href={`/raffle/${raffle.id}/edit`} className="btn btn-ghost flex-1 text-center text-sm">
               Details
             </Link>
+            <Link href={`/raffle/${raffle.id}/flyer`} className="btn btn-ghost flex-1 text-center text-sm">
+              Flyer
+            </Link>
             <Link href={`/raffle/${raffle.id}/verify`} className="btn btn-ghost flex-1 text-center text-sm">
               Verify
             </Link>

@@ -1,6 +1,6 @@
 # Fiddyfiddy Documentation & Playbook
 
-**Version:** 9.0  
+**Version:** 10.0  
 **Last Updated:** February 2026  
 **Platform:** Digital 50/50 Raffle System
 
@@ -23,6 +23,7 @@
 13. [Testing Checklist](#13-testing-checklist)
 14. [Troubleshooting](#14-troubleshooting)
 15. [Common Issues & Solutions](#15-common-issues--solutions)
+16. [UX & Engagement Features](#16-ux--engagement-features)
 
 ---
 
@@ -34,7 +35,7 @@ Fiddyfiddy is a digital 50/50 raffle platform that enables organizations to run 
 
 - Raffle creation and management
 - Ticket sales via Venmo
-- Payment verification
+- Hybrid payment verification (trust by default, verify winner)
 - Random winner drawing
 - Jackpot payout processing
 - IRS compliance for winnings
@@ -45,7 +46,7 @@ Fiddyfiddy is a digital 50/50 raffle platform that enables organizations to run 
 |---------|-------------|
 | **Digital Tickets** | QR code/link based ticket purchases |
 | **Venmo Payments** | No transaction fees for players or organizers |
-| **Auto-Verification** | Transaction ID verification |
+| **Hybrid Verification** | Trust by default, verify only the winner at draw time |
 | **Random Drawing** | Cryptographically random winner selection |
 | **Redraw Support** | Handle non-responsive winners |
 | **IRS Compliance** | Jackpots capped at $600 to avoid W-2G requirements |
@@ -78,9 +79,10 @@ fiddyfiddy/
 │   │   ├── auth/           # Authentication (login, logout, register, hash)
 │   │   ├── dashboard/      # Organizer dashboard data
 │   │   ├── draw/           # Drawing operations
-│   │   ├── raffles/        # Raffle CRUD + operations
+│   │   ├── raffles/        # Raffle CRUD + operations (including cancel)
 │   │   ├── tickets/        # Ticket operations
 │   │   └── admin/          # Admin operations (user management)
+│   ├── about/              # About/info page
 │   ├── admin/              # Admin pages
 │   ├── dashboard/          # Organizer dashboard
 │   ├── lobby/              # Public raffle listing
@@ -88,20 +90,20 @@ fiddyfiddy/
 │   ├── raffle/             # Raffle management pages
 │   │   └── [id]/
 │   │       ├── draw/       # Drawing interface
-│   │       ├── edit/       # Edit raffle
+│   │       ├── edit/       # Edit raffle (includes cancel button)
 │   │       ├── payout/     # Payout confirmation
 │   │       ├── report/     # Raffle report
 │   │       └── verify/     # Ticket verification
 │   ├── r/                  # Player-facing raffle pages
 │   │   └── [id]/
 │   │       └── confirm/    # Payment confirmation
-│   ├── register/           # Organizer registration
+│   ├── register/           # Organizer registration (self-service)
 │   └── ticket/             # Ticket lookup
 ├── lib/                    # Shared libraries
 │   ├── auth.js             # JWT authentication
 │   ├── drawing.js          # Drawing logic
 │   ├── knack.js            # Knack API wrapper
-│   ├── sendgrid.js         # Email templates
+│   ├── sendgrid.js         # Email templates (includes cancellation)
 │   ├── utils.js            # Utility functions
 │   └── venmo.js            # Venmo link generation
 ├── scripts/                # Utility scripts
@@ -160,6 +162,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 | `JWT_SECRET` | Token signing key | Generate: `openssl rand -base64 32` |
 | `NEXT_PUBLIC_SITE_URL` | Base URL for links | Your Vercel/custom domain |
 | `OWNER_VENMO` | Platform owner Venmo | Your Venmo handle |
+| `OWNER_EMAIL` | Owner notification email | Your email (receives new organizer alerts) |
 
 ---
 
@@ -330,10 +333,27 @@ Draft → Active → Drawing → Complete
 | Status | Description | Allowed Actions |
 |--------|-------------|-----------------|
 | **Draft** | Created but not live | Edit, Activate, Delete |
-| **Active** | Accepting ticket purchases | Verify tickets, Share, Draw |
+| **Active** | Accepting ticket purchases | Verify tickets, Share, Draw, Cancel |
 | **Drawing** | Winner selection in progress | Confirm winner, Redraw |
 | **Complete** | Winner confirmed and paid | View report |
-| **Cancelled** | Raffle cancelled | Refund tickets (manual) |
+| **Cancelled** | Raffle cancelled by organizer | View only |
+
+### Cancelling a Raffle
+
+Organizers can cancel active raffles with player notification:
+
+1. Navigate to Dashboard → Click "Details" on raffle
+2. Scroll down → Click "❌ Cancel Raffle"
+3. Enter cancellation reason (required)
+4. Confirm cancellation
+
+**What happens:**
+- Raffle status changes to "Cancelled"
+- All ticket holders receive email with:
+  - Cancellation notice
+  - Organizer's reason
+  - Organizer's contact for refunds
+- Raffle remains in system for audit trail
 
 ### Creating a Raffle
 
@@ -362,21 +382,22 @@ Before activating, verify:
 
 ## 7. Ticket Lifecycle
 
-### Status Flow
+### Status Flow (Hybrid Verification)
 
 ```
-Created → Pending → Verified → (Winner)
-                        ↓
-                    Rejected
+Created → Verified (automatic) → (Winner)
+              ↓
+          Rejected (if organizer flags)
 ```
+
+**Note:** As of v10, tickets are **auto-verified** on creation. This "trust by default" model reduces friction for players. Organizers verify payment only for the winning ticket at draw time.
 
 ### Status Definitions
 
 | Status | Description |
 |--------|-------------|
-| **Pending** | Payment submitted, awaiting verification |
-| **Verified** | Payment confirmed, eligible for drawing |
-| **Rejected** | Payment invalid or fraudulent |
+| **Verified** | Default status - eligible for drawing (payment verified at draw time) |
+| **Rejected** | Organizer flagged as invalid |
 | **Winner** | Selected as winning ticket |
 
 ### Ticket Number Format
@@ -389,25 +410,31 @@ Example: TIGERS-20260201-0023
          Prefix   Date   Seq#
 ```
 
-### Purchase Flow (Player)
+### Purchase Flow (Player) - Simplified
 
 1. Player visits raffle page (`/r/{id}`)
 2. Enters email and Venmo handle
-3. Clicks Venmo payment link/scans QR
-4. Completes payment in Venmo app
-5. Returns to confirm page
-6. Enters transaction ID or uploads screenshot
-7. Receives ticket email
+3. Clicks "Buy Ticket"
+4. Ticket created and **auto-verified**
+5. Redirected to Venmo to complete payment
+6. Receives ticket confirmation email immediately
 
-### Verification Flow (Organizer)
+**Note:** Players no longer need to submit transaction IDs or screenshots. The system trusts that payment will be made.
 
-1. Navigate to Dashboard → Raffle → "Verify"
-2. View pending tickets table
-3. For each ticket:
-   - Click row to expand details
-   - Review payment proof (screenshot/txn ID)
-   - Click "Verify" or "Reject"
-4. Or bulk verify multiple tickets
+### Verification at Draw Time (Organizer)
+
+1. Navigate to Drawing page
+2. Draw winner
+3. Check your Venmo for payment from winner's handle
+4. If payment found → Confirm winner
+5. If no payment → Redraw
+
+### Manual Rejection (Optional)
+
+Organizers can still reject suspicious tickets:
+1. Dashboard → Raffle → "Verify" page
+2. Click on ticket row to expand
+3. Click "Reject" if needed
 
 ---
 
@@ -500,6 +527,7 @@ Example: `venmo://paycharge?txn=pay&recipients=@fiddyfiddy&amount=5.00&note=TIGE
 | `/api/raffles/[id]/report` | GET | Get raffle report |
 | `/api/raffles/[id]/payout-info` | GET | Get payout details |
 | `/api/raffles/[id]/confirm-payout` | POST | Confirm payout sent |
+| `/api/raffles/[id]/cancel` | POST | Cancel raffle (requires reason) |
 
 ### Ticket Endpoints
 
@@ -640,23 +668,28 @@ git push
 #### Ticket Purchase
 - [ ] View raffle page (logged out)
 - [ ] Venmo link generates correctly
-- [ ] Submit with transaction ID
-- [ ] Submit with screenshot
+- [ ] Ticket auto-verified immediately
 - [ ] Receive confirmation email
-- [ ] Ticket appears in verification queue
+- [ ] Urgency message appears when tickets low
 
-#### Verification
-- [ ] View pending tickets
+#### Cancel Raffle
+- [ ] Cancel button visible on active raffle edit page
+- [ ] Cancel modal opens with reason field
+- [ ] Cancellation requires reason
+- [ ] Players receive cancellation email
+- [ ] Raffle status changes to "Cancelled"
+
+#### Verification (Optional)
+- [ ] View all tickets on verify page
 - [ ] Expand ticket row (drill-down)
-- [ ] View payment screenshot
-- [ ] Verify single ticket
-- [ ] Reject single ticket
-- [ ] Bulk verify multiple tickets
+- [ ] Reject suspicious ticket
+- [ ] Rejected tickets ineligible for draw
 
 #### Drawing
 - [ ] Draw winner from verified tickets
 - [ ] Winner email sent
-- [ ] Redraw works
+- [ ] Check winner's Venmo payment in organizer's Venmo
+- [ ] Redraw works if no payment found
 - [ ] Confirm winner
 - [ ] Payout confirmation
 
@@ -664,12 +697,20 @@ git push
 - [ ] Generate raffle report
 - [ ] Export/view report data
 
+#### New Organizer Flow
+- [ ] Register at /register
+- [ ] Auto-approved (Active status)
+- [ ] Owner receives email notification
+- [ ] Can login immediately
+- [ ] Can create raffle immediately
+
 ### Mobile Testing
 
 - [ ] Lobby displays correctly
 - [ ] Raffle page is touch-friendly
 - [ ] Venmo deep link opens app
-- [ ] Can upload screenshot from camera
+- [ ] Jackpot font size proportional
+- [ ] Venmo @ symbol not overlapping
 
 ---
 
@@ -793,6 +834,57 @@ is_public: record.field_73 === true ||
 
 ---
 
+## 16. UX & Engagement Features
+
+### Urgency Messaging
+
+The player raffle page displays dynamic urgency messages based on ticket availability:
+
+| Tickets Remaining | Message |
+|-------------------|---------|
+| ≤ 20 | 🔥 "Only X tickets left!" (amber, pulsing) |
+| 21-50 | ⚡ "Selling fast — X remaining" (cyan) |
+| > 50 | No message |
+
+### Share Prompts
+
+Footer includes sharing options to drive virality:
+- "Know someone who'd want to play?"
+- 💬 "Text a Friend" button (opens SMS with link)
+- 🔗 "Copy Link" button
+
+### Self-Service Organizer Registration
+
+- Public registration at `/register`
+- Organizers auto-approved with "Active" status
+- Platform owner receives email notification on each signup
+- New organizers can immediately create and run raffles
+
+### About Page
+
+Public information page at `/about` includes:
+- What is Fiddyfiddy explanation
+- How it works (3-step process)
+- Benefits for organizers
+- FAQ section
+- Contact information
+- CTA buttons for registration and browsing raffles
+
+### Future Enhancement Ideas
+
+| Enhancement | Benefit |
+|-------------|---------|
+| Countdown timer | Creates urgency for timed draws |
+| Recent activity feed | "John just bought 3 tickets" — social proof |
+| Share-to-unlock | "Share to get 1 bonus entry" — virality |
+| Lucky number picker | Let players pick their number — ownership feeling |
+| Winner showcase | Past winners build trust and excitement |
+| Progress milestones | "50% to goal! 🎉" — gamification |
+| Push notifications | "Drawing in 1 hour!" — re-engagement |
+| Referral tracking | Track who shared, reward top sharers |
+
+---
+
 ## Appendix A: Quick Reference
 
 ### URLs
@@ -836,7 +928,7 @@ git push
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 10.0 | Feb 2026 | Hybrid verification, cancel raffle with notifications, about page, self-service signups |
+| 10.0 | Feb 2026 | **Major Update:** Hybrid verification (auto-verify tickets), cancel raffle with player notifications, about page, self-service organizer signups with owner email alerts, UI fixes (jackpot font, Venmo @ overlap), urgency messaging, share prompts |
 | 9.0 | Feb 2026 | Added verify table drill-down |
 | 8.0 | Jan 2026 | Production deployment |
 | 7.0 | Jan 2026 | Field mapping fixes |
