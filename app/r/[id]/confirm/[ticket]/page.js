@@ -239,7 +239,10 @@ export default function ConfirmTicketPage() {
             )}
 
             <form onSubmit={handleSubmit} className="card">
-              <h2 className="text-lg font-semibold mb-4">Step 2: Confirm Your Payment</h2>
+              <h2 className="text-lg font-semibold mb-4">Optional: Confirm Your Payment</h2>
+              <p className="text-gray-400 text-sm mb-4">
+                Your ticket is already active! This step is optional but helps the organizer verify payments faster.
+              </p>
               
               {/* Transaction ID */}
               <div className="mb-6">
