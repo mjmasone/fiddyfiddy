@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
+const COLOR_PRESETS = {
+  purple: { primary: '#8B5CF6', name: 'Purple' },
+  blue: { primary: '#3B82F6', name: 'Blue' },
+  green: { primary: '#10B981', name: 'Green' },
+  red: { primary: '#EF4444', name: 'Red' },
+  orange: { primary: '#F97316', name: 'Orange' },
+  gold: { primary: '#EAB308', name: 'Gold' },
+  teal: { primary: '#14B8A6', name: 'Teal' },
+  pink: { primary: '#EC4899', name: 'Pink' },
+};
+
 export default function RafflePage() {
   const params = useParams();
   const router = useRouter();
@@ -133,6 +144,7 @@ export default function RafflePage() {
   const maxPurchase = Math.min(10, ticketsRemaining);
   const percentSold = ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100; 
   const showScarcity = percentSold >= 70;
+  const themeColor = COLOR_PRESETS[raffle.theme_color]?.primary || '#8B5CF6';
 
   return (
     <div className="min-h-screen">
@@ -205,8 +217,8 @@ export default function RafflePage() {
           </div>
           <div className="h-3 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
-              style={{ width: `${((raffle.tickets_sold || 0) / raffle.max_tickets) * 100}%` }}
+              className="h-full transition-all duration-500"
+              style={{ background: themeColor, width: `${((raffle.tickets_sold || 0) / raffle.max_tickets) * 100}%` }}
             />
           </div>
         </div>
@@ -342,7 +354,8 @@ export default function RafflePage() {
 
               <button
                 type="submit"
-                className="btn btn-primary w-full text-lg py-4"
+                className="btn w-full text-lg py-4"
+                style={{ backgroundColor: themeColor }}
                 disabled={submitting}
               >
                 {submitting ? (
