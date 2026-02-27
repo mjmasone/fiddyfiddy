@@ -285,10 +285,16 @@ export default function EditRafflePage() {
               <span className="text-gray-400">Draw Trigger</span>
               <span>{raffle?.draw_trigger}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-white/10">
+             <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Ticket Prefix</span>
               <span className="font-mono">{raffle?.ticket_prefix}</span>
             </div>
+            {raffle?.logo_url && (
+              <div className="flex justify-between py-2 border-b border-white/10">
+                <span className="text-gray-400">Logo</span>
+                <img src={raffle.logo_url} alt="Logo" className="h-8 rounded" />
+              </div>
+            )}
             <div className="flex justify-between py-2">
               <span className="text-gray-400">Visibility</span>
               <span>{raffle?.is_public ? 'Public' : 'Private'}</span>

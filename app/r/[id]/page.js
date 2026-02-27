@@ -163,9 +163,9 @@ export default function RafflePage() {
 
         {/* Raffle Info */}
         <div className="text-center mb-8">
-          {raffle.logo ? (
+          {raffle.logo_url ? (
             <img
-              src={raffle.logo}
+              src={raffle.logo_url}
               alt={raffle.beneficiary_name}
               className="w-24 h-24 rounded-xl mx-auto mb-4 object-cover"
             />

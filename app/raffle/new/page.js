@@ -23,6 +23,7 @@ export default function NewRafflePage() {
     draw_trigger: 'Manual',
     draw_time: '',
     draw_ticket_count: '',
+    logo_url: '',
     is_public: true,
   });
 
@@ -199,6 +200,24 @@ export default function NewRafflePage() {
               </div>
             </div>
           </div>
+
+          {/* Logo */}
+                    <div className="card">
+                      <h2 className="text-lg font-semibold mb-4">Logo</h2>
+                      <div>
+                        <label className="block text-sm text-gray-400 mb-2">Logo URL (Optional)</label>
+                        <input
+                          type="url"
+                          className="input"
+                          placeholder="https://example.com/logo.png"
+                          value={formData.logo_url}
+                          onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Paste a link to your team/organization logo. Shows on raffle page and flyer.
+                        </p>
+                      </div>
+                    </div>
 
           {/* Pricing */}
           <div className="card">
