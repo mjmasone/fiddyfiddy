@@ -131,6 +131,8 @@ export default function RafflePage() {
   const isSoldOut = ticketsRemaining <= 0;
   const isActive = raffle.status === 'Active';
   const maxPurchase = Math.min(10, ticketsRemaining);
+  const percentSold = ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100; 
+  const showScarcity = percentSold >= 70;
 
   return (
     <div className="min-h-screen">
@@ -186,13 +188,16 @@ export default function RafflePage() {
             <p className="text-gray-400 text-sm mb-1">Current Jackpot</p>
             <p className="jackpot-display text-3xl">${jackpot}</p>
           </div>
+        {showScarcity && (
           <div className="card text-center">
             <p className="text-gray-400 text-sm mb-1">Tickets Left</p>
             <p className="text-2xl font-bold">{ticketsRemaining}</p>
           </div>
-        </div>
+        )}
+                  </div>
 
         {/* Progress */}
+        {showScarcity && (
         <div className="card mb-8">
           <div className="flex justify-between text-sm text-gray-400 mb-2">
             <span>{raffle.tickets_sold || 0} sold</span>
@@ -205,6 +210,8 @@ export default function RafflePage() {
             />
           </div>
         </div>
+      )}
+        
         {/* Urgency messaging - shows when 70%+ sold */}
         {(() => {
           const percentSold = ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100;
