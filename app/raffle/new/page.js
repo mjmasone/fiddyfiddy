@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+const COLOR_PRESETS = {
+  purple: { primary: '#8B5CF6', name: 'Purple' },
+  blue: { primary: '#3B82F6', name: 'Blue' },
+  green: { primary: '#10B981', name: 'Green' },
+  red: { primary: '#EF4444', name: 'Red' },
+  orange: { primary: '#F97316', name: 'Orange' },
+  gold: { primary: '#EAB308', name: 'Gold' },
+  teal: { primary: '#14B8A6', name: 'Teal' },
+  pink: { primary: '#EC4899', name: 'Pink' },
+};
+
 export default function NewRafflePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -24,6 +35,7 @@ export default function NewRafflePage() {
     draw_time: '',
     draw_ticket_count: '',
     logo_url: '',
+    theme_color: 'purple',
     is_public: true,
   });
 
@@ -251,6 +263,31 @@ export default function NewRafflePage() {
                 <span className="font-bold text-emerald-400">${maxJackpot}</span>
               </div>
             </div>
+          </div>
+
+          {/* Theme Color */}
+          <div className="card">
+            <h2 className="text-lg font-semibold mb-4">Theme Color</h2>
+            <div className="grid grid-cols-4 gap-2">
+              {Object.entries(COLOR_PRESETS).map(([key, color]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, theme_color: key })}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    formData.theme_color === key
+                      ? 'border-white scale-105'
+                      : 'border-transparent hover:border-white/30'
+                  }`}
+                  style={{ backgroundColor: color.primary }}
+                >
+                  <span className="sr-only">{color.name}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Selected: {COLOR_PRESETS[formData.theme_color]?.name || 'Purple'}
+            </p>
           </div>
 
           {/* Drawing */}
