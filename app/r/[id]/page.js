@@ -205,6 +205,19 @@ export default function RafflePage() {
             />
           </div>
         </div>
+        {/* Urgency messaging - shows when 70%+ sold */}
+        {(() => {
+          const percentSold = ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100;
+          const threshold = 70; // TODO Phase 2: pull from raffle.urgency_threshold
+          if (percentSold >= threshold && ticketsRemaining > 0) {
+            return (
+              <p className="text-gray-300 text-sm mt-2 text-center">
+                🎟️ {ticketsRemaining} tickets remaining • Jackpot: ${jackpot}
+              </p>
+            );
+          }
+          return null;
+        })()}
 
         {/* Purchase Form or Status */}
         {!isActive ? (
