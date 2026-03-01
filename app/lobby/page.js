@@ -109,15 +109,16 @@ function RaffleCard({ raffle }) {
   );
   const jackpot = ((raffle.tickets_sold || 0) * raffle.ticket_price * 0.5).toFixed(2);
   const percentSold = ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100;
+  const showScarcity = raffle.max_tickets > 0 ? percentSold >= 70 : false;
 
   return (
     <Link href={`/r/${raffle.id}`}>
       <div className="card card-hover h-full flex flex-col">
         {/* Logo/Icon */}
         <div className="flex items-center gap-4 mb-4">
-          {raffle.logo ? (
+          {raffle.logo_url ? (
             <img
-              src={raffle.logo}
+              src={raffle.logo_url}
               alt={raffle.beneficiary_name}
               className="w-12 h-12 rounded-lg object-cover"
             />
@@ -134,17 +135,20 @@ function RaffleCard({ raffle }) {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
+          <div className={showScarcity ? '' : 'col-span-2'}>
             <p className="text-gray-400 text-sm">Ticket Price</p>
             <p className="text-xl font-bold">{formatCurrency(raffle.ticket_price)}</p>
           </div>
-          <div>
-            <p className="text-gray-400 text-sm">Current Jackpot</p>
-            <p className="text-xl font-bold text-emerald-400">{formatCurrency(jackpot)}</p>
-          </div>
+          {showScarcity && (
+            <div>
+              <p className="text-gray-400 text-sm">Current Jackpot</p>
+              <p className="text-xl font-bold text-emerald-400">{formatCurrency(jackpot)}</p>
+            </div>
+          )}
         </div>
 
         {/* Progress bar */}
+        {showScarcity && (
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-400 mb-1">
             <span>{raffle.tickets_sold || 0} sold</span>
@@ -157,6 +161,7 @@ function RaffleCard({ raffle }) {
             />
           </div>
         </div>
+        )}
 
         {/* CTA */}
         <div className="mt-auto">
