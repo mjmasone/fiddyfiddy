@@ -142,7 +142,9 @@ export default function RafflePage() {
   const isSoldOut = ticketsRemaining <= 0;
   const isActive = raffle.status === 'Active';
   const maxPurchase = Math.min(10, ticketsRemaining);
-  const percentSold = ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100; 
+  const percentSold = raffle.max_tickets > 0 
+  ? ((raffle.tickets_sold || 0) / raffle.max_tickets) * 100 
+  : 0;
   const showScarcity = percentSold >= 70;
   const themeColor = COLOR_PRESETS[raffle.theme_color]?.primary || '#8B5CF6';
 
